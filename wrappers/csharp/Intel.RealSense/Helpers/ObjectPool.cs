@@ -75,27 +75,21 @@ namespace Intel.RealSense
         {
             var stack = GetPool(t);
             int count;
+            Base.PooledObject obj;
             lock ((stack as ICollection).SyncRoot)
             {
                 count = stack.Count;
-            }
-
-            if (count > 0)
-            {
-                Base.PooledObject obj;
-                lock ((stack as ICollection).SyncRoot)
+                if (count > 0)
                 {
                     obj = stack.Pop();
+                    obj.m_instance.Reset(ptr);
+                    obj.Initialize();
+                    return obj;
                 }
-
-                obj.m_instance.Reset(ptr);
-                obj.Initialize();
-                return obj;
             }
-
             return CreateInstance(t, ptr);
         }
-
+        
         /// <summary>
         /// Get an object from the pool, should be released back
         /// </summary>
